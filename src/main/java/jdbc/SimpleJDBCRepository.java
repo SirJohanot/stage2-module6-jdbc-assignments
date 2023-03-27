@@ -27,8 +27,8 @@ public class SimpleJDBCRepository {
     private static final String findUserByNameSQL = "SELECT * FROM user WHERE firstname=?;";
     private static final String findAllUserSQL = "SELECT * FROM user;";
 
-    public Long createUser() throws SQLException {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(createUserSQL, "first name", "last name", 3);
+    public Long createUser(User user) throws SQLException {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(createUserSQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return resultSet.getLong(1);
         }
@@ -76,11 +76,20 @@ public class SimpleJDBCRepository {
         }
     }
 
-    public User updateUser() {
-        return null;
+    public User updateUser(User user) throws SQLException {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(updateUserSQL, user.getFirstName(), user.getLastName(), user.getAge());
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            Long id = resultSet.getLong(1);
+            String firstName = resultSet.getString(2);
+            String lastName = resultSet.getString(3);
+            int age = resultSet.getInt(4);
+
+            return new User(id, firstName, lastName, age);
+        }
     }
 
-    private void deleteUser(Long userId) throws SQLException {
+    public void deleteUser(Long userId) throws SQLException {
         try (PreparedStatement preparedStatement = buildPreparedStatement(deleteUser, userId)) {
             preparedStatement.executeUpdate();
         }
