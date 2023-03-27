@@ -16,9 +16,18 @@ import java.util.List;
 @NoArgsConstructor
 public class SimpleJDBCRepository {
 
-    private Connection connection = null;
+    private Connection connection;
     private PreparedStatement ps = null;
     private Statement st = null;
+
+    {
+        try {
+            connection = CustomDataSource.getInstance()
+                    .getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final String CREATE_USER_SQL = "INSERT INTO user(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
     private static final String UPDATE_USER_SQL = "UPDATE user SET firstname=?, lastname=?, age=? WHERE id=?;";
