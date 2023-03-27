@@ -29,15 +29,15 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String CREATE_USER_SQL = "INSERT INTO ?(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
-    private static final String UPDATE_USER_SQL = "UPDATE ? SET firstname=?, lastname=?, age=? WHERE id=?;";
-    private static final String DELETE_USER = "DELETE FROM ? WHERE id=?;";
-    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM ? WHERE id=?;";
-    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM ? WHERE firstname=?;";
-    private static final String FIND_ALL_USER_SQL = "SELECT * FROM ?;";
+    private static final String CREATE_USER_SQL = "INSERT INTO myusers(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
+    private static final String UPDATE_USER_SQL = "UPDATE myusers SET firstname=?, lastname=?, age=? WHERE id=?;";
+    private static final String DELETE_USER = "DELETE FROM myusers WHERE id=?;";
+    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myusers WHERE id=?;";
+    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM myusers WHERE firstname=?;";
+    private static final String FIND_ALL_USER_SQL = "SELECT * FROM myusers;";
 
     public Long createUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, "user", user.getFirstName(), user.getLastName(), user.getAge());
+        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return resultSet.getLong(1);
         } catch (SQLException e) {
@@ -46,7 +46,7 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserById(Long userId) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_ID_SQL, "user", userId);
+        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_ID_SQL, userId);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -61,7 +61,7 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserByName(String userName) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_NAME_SQL, "user", userName);
+        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_NAME_SQL, userName);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -76,8 +76,7 @@ public class SimpleJDBCRepository {
     }
 
     public List<User> findAllUser() {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_ALL_USER_SQL, "user");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery(FIND_ALL_USER_SQL)) {
             List<User> results = new ArrayList<>();
             do {
                 Long id = resultSet.getLong(1);
@@ -94,7 +93,7 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, "user", user.getFirstName(), user.getLastName(), user.getAge());
+        try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -109,7 +108,7 @@ public class SimpleJDBCRepository {
     }
 
     public void deleteUser(Long userId) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(DELETE_USER, "user", userId)) {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(DELETE_USER, userId)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
