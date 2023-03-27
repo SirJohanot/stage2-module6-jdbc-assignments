@@ -29,12 +29,12 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String CREATE_USER_SQL = "INSERT INTO user(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
-    private static final String UPDATE_USER_SQL = "UPDATE user SET firstname=?, lastname=?, age=? WHERE id=?;";
-    private static final String DELETE_USER = "DELETE FROM user WHERE id=?;";
-    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM user WHERE id=?;";
-    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM user WHERE firstname=?;";
-    private static final String FIND_ALL_USER_SQL = "SELECT * FROM user;";
+    private static final String CREATE_USER_SQL = "INSERT INTO myuser(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
+    private static final String UPDATE_USER_SQL = "UPDATE myuser SET firstname=?, lastname=?, age=? WHERE id=?;";
+    private static final String DELETE_USER = "DELETE FROM myuser WHERE id=?;";
+    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myuser WHERE id=?;";
+    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM myuser WHERE firstname=?;";
+    private static final String FIND_ALL_USER_SQL = "SELECT * FROM myuser;";
 
     public Long createUser(User user) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
