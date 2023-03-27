@@ -42,7 +42,7 @@ public class SimpleJDBCRepository {
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM myusers;";
 
     public Long createUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getId(), user.getFirstName(), user.getLastName(), user.getAge())) {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge())) {
             preparedStatement.executeUpdate();
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                 resultSet.next();
