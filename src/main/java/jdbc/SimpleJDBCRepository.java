@@ -29,7 +29,7 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String CREATE_USER_SQL = "INSERT INTO myusers(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
+    private static final String CREATE_USER_SQL = "INSERT INTO myusers(firstname, lastname, age) VALUES(?, ?, ?);";
     private static final String UPDATE_USER_SQL = "UPDATE myusers SET firstname=?, lastname=?, age=? WHERE id=?;";
     private static final String DELETE_USER = "DELETE FROM myusers WHERE id=?;";
     private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myusers WHERE id=?;";
@@ -37,10 +37,12 @@ public class SimpleJDBCRepository {
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM myusers;";
 
     public Long createUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            resultSet.next();
-            return resultSet.getLong("id");
+        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge())) {
+            preparedStatement.executeUpdate();
+            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                resultSet.next();
+                return resultSet.getLong("id");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -100,18 +102,9 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (!resultSet.next()) {
-                return null;
-            }
-
-            Long id = resultSet.getLong(1);
-            String firstName = resultSet.getString(2);
-            String lastName = resultSet.getString(3);
-            int age = resultSet.getInt(4);
-
-            return new User(id, firstName, lastName, age);
+        try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge())) {
+            preparedStatement.executeUpdate();
+            return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
