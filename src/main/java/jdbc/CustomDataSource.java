@@ -21,7 +21,7 @@ public class CustomDataSource implements DataSource {
     private static final String DRIVER_CLASS = "postgres.driver";
     private static final String CONNECTION_URL = "postgres.url";
     private static final String USERNAME = "postgres.name";
-    private static final String PASSWORD = "postgres.password";
+    private static final String DB_PASSWORD = "postgres.password";
 
     private static volatile CustomDataSource instance;
     private final String driver;
@@ -56,7 +56,7 @@ public class CustomDataSource implements DataSource {
 
         String driver = properties.getProperty(DRIVER_CLASS);
         String url = properties.getProperty(CONNECTION_URL);
-        String password = properties.getProperty(PASSWORD);
+        String password = properties.getProperty(DB_PASSWORD);
         String name = properties.getProperty(USERNAME);
 
         Class.forName(driver);
@@ -81,10 +81,12 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public void setLogWriter(PrintWriter printWriter) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setLoginTimeout(int i) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -20,15 +20,15 @@ public class SimpleJDBCRepository {
     private PreparedStatement ps = null;
     private Statement st = null;
 
-    private static final String createUserSQL = "INSERT INTO user(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
-    private static final String updateUserSQL = "UPDATE user SET firstname=?, lastname=?, age=? WHERE id=?;";
-    private static final String deleteUser = "DELETE FROM user WHERE id=?;";
-    private static final String findUserByIdSQL = "SELECT * FROM user WHERE id=?;";
-    private static final String findUserByNameSQL = "SELECT * FROM user WHERE firstname=?;";
-    private static final String findAllUserSQL = "SELECT * FROM user;";
+    private static final String CREATE_USER_SQL = "INSERT INTO user(firstname, lastname, age) VALUES(?, ?, ?) RETURNING id;";
+    private static final String UPDATE_USER_SQL = "UPDATE user SET firstname=?, lastname=?, age=? WHERE id=?;";
+    private static final String DELETE_USER = "DELETE FROM user WHERE id=?;";
+    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM user WHERE id=?;";
+    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM user WHERE firstname=?;";
+    private static final String FIND_ALL_USER_SQL = "SELECT * FROM user;";
 
     public Long createUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(createUserSQL, user.getFirstName(), user.getLastName(), user.getAge());
+        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return resultSet.getLong(1);
         } catch (SQLException e) {
@@ -37,7 +37,7 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserById(Long userId) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(findUserByIdSQL, userId);
+        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_ID_SQL, userId);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -52,7 +52,7 @@ public class SimpleJDBCRepository {
     }
 
     public User findUserByName(String userName) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(findUserByNameSQL, userName);
+        try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_NAME_SQL, userName);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -67,7 +67,7 @@ public class SimpleJDBCRepository {
     }
 
     public List<User> findAllUser() {
-        try (ResultSet resultSet = connection.createStatement().executeQuery(findAllUserSQL)) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery(FIND_ALL_USER_SQL)) {
             List<User> results = new ArrayList<>();
             do {
                 Long id = resultSet.getLong(1);
@@ -84,7 +84,7 @@ public class SimpleJDBCRepository {
     }
 
     public User updateUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(updateUserSQL, user.getFirstName(), user.getLastName(), user.getAge());
+        try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             Long id = resultSet.getLong(1);
@@ -99,7 +99,7 @@ public class SimpleJDBCRepository {
     }
 
     public void deleteUser(Long userId) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(deleteUser, userId)) {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(DELETE_USER, userId)) {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
