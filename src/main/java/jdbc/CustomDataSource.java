@@ -38,9 +38,13 @@ public class CustomDataSource implements DataSource {
         this.password = password;
     }
 
-    public static CustomDataSource getInstance() throws IOException, ClassNotFoundException {
+    public static CustomDataSource getInstance() {
         if (instance == null) {
-            instance = createSourceFromFile();
+            try {
+                instance = createSourceFromFile();
+            } catch (ClassNotFoundException | IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return instance;
     }
