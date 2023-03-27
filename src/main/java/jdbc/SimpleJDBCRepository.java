@@ -16,6 +16,11 @@ import java.util.List;
 @NoArgsConstructor
 public class SimpleJDBCRepository {
 
+    private static final String ID_COLUMN = "id";
+    private static final String FIRST_NAME_COLUMN = "firstname";
+    private static final String LAST_NAME_COLUMN = "lastname";
+    private static final String AGE_COLUMN = "age";
+
     private Connection connection;
     private PreparedStatement ps = null;
     private Statement st = null;
@@ -29,19 +34,19 @@ public class SimpleJDBCRepository {
         }
     }
 
-    private static final String CREATE_USER_SQL = "INSERT INTO myusers(firstname, lastname, age) VALUES(?, ?, ?);";
-    private static final String UPDATE_USER_SQL = "UPDATE myusers SET firstname=?, lastname=?, age=? WHERE id=?;";
-    private static final String DELETE_USER = "DELETE FROM myusers WHERE id=?;";
-    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myusers WHERE id=?;";
-    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM myusers WHERE firstname=?;";
+    private static final String CREATE_USER_SQL = "INSERT INTO myusers(id, firstname, lastname, age) VALUES(?, ?, ?, ?);";
+    private static final String UPDATE_USER_SQL = "UPDATE myusers SET firstname=?, lastname=?, age=? WHERE myusers.id=?;";
+    private static final String DELETE_USER = "DELETE FROM myusers WHERE myusers.id=?;";
+    private static final String FIND_USER_BY_ID_SQL = "SELECT * FROM myusers WHERE myusers.id=?;";
+    private static final String FIND_USER_BY_NAME_SQL = "SELECT * FROM myusers WHERE myusers.firstname=?;";
     private static final String FIND_ALL_USER_SQL = "SELECT * FROM myusers;";
 
     public Long createUser(User user) {
-        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge())) {
+        try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getId(), user.getFirstName(), user.getLastName(), user.getAge())) {
             preparedStatement.executeUpdate();
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
                 resultSet.next();
-                return resultSet.getLong("id");
+                return resultSet.getLong(ID_COLUMN);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -55,10 +60,10 @@ public class SimpleJDBCRepository {
                 return null;
             }
 
-            Long id = resultSet.getLong("id");
-            String firstName = resultSet.getString("firstName");
-            String lastName = resultSet.getString("lastName");
-            int age = resultSet.getInt("age");
+            Long id = resultSet.getLong(ID_COLUMN);
+            String firstName = resultSet.getString(FIRST_NAME_COLUMN);
+            String lastName = resultSet.getString(LAST_NAME_COLUMN);
+            int age = resultSet.getInt(AGE_COLUMN);
 
             return new User(id, firstName, lastName, age);
         } catch (SQLException e) {
@@ -73,10 +78,10 @@ public class SimpleJDBCRepository {
                 return null;
             }
 
-            Long id = resultSet.getLong("id");
-            String firstName = resultSet.getString("firstName");
-            String lastName = resultSet.getString("lastName");
-            int age = resultSet.getInt("age");
+            Long id = resultSet.getLong(ID_COLUMN);
+            String firstName = resultSet.getString(FIRST_NAME_COLUMN);
+            String lastName = resultSet.getString(LAST_NAME_COLUMN);
+            int age = resultSet.getInt(AGE_COLUMN);
 
             return new User(id, firstName, lastName, age);
         } catch (SQLException e) {
@@ -88,10 +93,10 @@ public class SimpleJDBCRepository {
         try (ResultSet resultSet = connection.createStatement().executeQuery(FIND_ALL_USER_SQL)) {
             List<User> results = new ArrayList<>();
             while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
-                String firstName = resultSet.getString("firstName");
-                String lastName = resultSet.getString("lastName");
-                int age = resultSet.getInt("age");
+                Long id = resultSet.getLong(ID_COLUMN);
+                String firstName = resultSet.getString(FIRST_NAME_COLUMN);
+                String lastName = resultSet.getString(LAST_NAME_COLUMN);
+                int age = resultSet.getInt(AGE_COLUMN);
                 results.add(new User(id, firstName, lastName, age));
             }
 
