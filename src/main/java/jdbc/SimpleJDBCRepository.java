@@ -44,10 +44,11 @@ public class SimpleJDBCRepository {
     public Long createUser(User user) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge())) {
             preparedStatement.executeUpdate();
-            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                resultSet.next();
-                return resultSet.getLong(ID_COLUMN);
-            }
+//            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+//                resultSet.next();
+//                return resultSet.getLong(ID_COLUMN);
+//            }
+            return 0L;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
