@@ -39,7 +39,8 @@ public class SimpleJDBCRepository {
     public Long createUser(User user) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(CREATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            return resultSet.getLong(1);
+            resultSet.next();
+            return resultSet.getLong("id");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -48,11 +49,14 @@ public class SimpleJDBCRepository {
     public User findUserById(Long userId) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_ID_SQL, userId);
              ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
 
-            Long id = resultSet.getLong(1);
-            String firstName = resultSet.getString(2);
-            String lastName = resultSet.getString(3);
-            int age = resultSet.getInt(4);
+            Long id = resultSet.getLong("id");
+            String firstName = resultSet.getString("firstName");
+            String lastName = resultSet.getString("lastName");
+            int age = resultSet.getInt("age");
 
             return new User(id, firstName, lastName, age);
         } catch (SQLException e) {
@@ -63,11 +67,14 @@ public class SimpleJDBCRepository {
     public User findUserByName(String userName) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(FIND_USER_BY_NAME_SQL, userName);
              ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
 
-            Long id = resultSet.getLong(1);
-            String firstName = resultSet.getString(2);
-            String lastName = resultSet.getString(3);
-            int age = resultSet.getInt(4);
+            Long id = resultSet.getLong("id");
+            String firstName = resultSet.getString("firstName");
+            String lastName = resultSet.getString("lastName");
+            int age = resultSet.getInt("age");
 
             return new User(id, firstName, lastName, age);
         } catch (SQLException e) {
@@ -78,13 +85,13 @@ public class SimpleJDBCRepository {
     public List<User> findAllUser() {
         try (ResultSet resultSet = connection.createStatement().executeQuery(FIND_ALL_USER_SQL)) {
             List<User> results = new ArrayList<>();
-            do {
-                Long id = resultSet.getLong(1);
-                String firstName = resultSet.getString(2);
-                String lastName = resultSet.getString(3);
-                int age = resultSet.getInt(4);
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                String firstName = resultSet.getString("firstName");
+                String lastName = resultSet.getString("lastName");
+                int age = resultSet.getInt("age");
                 results.add(new User(id, firstName, lastName, age));
-            } while (resultSet.next());
+            }
 
             return results;
         } catch (SQLException e) {
@@ -95,6 +102,9 @@ public class SimpleJDBCRepository {
     public User updateUser(User user) {
         try (PreparedStatement preparedStatement = buildPreparedStatement(UPDATE_USER_SQL, user.getFirstName(), user.getLastName(), user.getAge());
              ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (!resultSet.next()) {
+                return null;
+            }
 
             Long id = resultSet.getLong(1);
             String firstName = resultSet.getString(2);
